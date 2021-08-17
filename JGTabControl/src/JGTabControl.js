@@ -384,7 +384,11 @@ isc.JGTabControl.addMethods({
             if (staticTabSettings) {
                 for (var i = 0, len = staticTabSettings.length; i < len; i++) {
                     var staticTab = staticTabSettings[i];
-                    widget[staticTab.seq < dyIndex ? "_preStaticTab" : "_lastStaticTab"].push(staticTab);
+                    if (staticTab.seq < dyIndex) {
+                        _this._preStaticTab.push(staticTab);
+                    } else {
+                        _this._lastStaticTab.push(staticTab);
+                    }
                 }
             }
 
