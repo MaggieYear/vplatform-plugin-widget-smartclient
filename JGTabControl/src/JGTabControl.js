@@ -584,7 +584,7 @@ isc.JGTabControl.addMethods({
 					type = mappingItem["paramType"] + "";
 
 				if (type === "expression") { //表达式
-                    var expressionValue = _this._expressionHandler(source);
+                    var expressionValue = this._expressionHandler(source);
 					variable[target] = expressionValue;
 				}else if(type === "entityField"){
 					variable[target] = entityFieldValue[source];
@@ -601,6 +601,7 @@ isc.JGTabControl.addMethods({
      * 新增记录
     * */
     insertRecord: function (widget, dynamicPageData, curTabsetObj) {
+        var _this = this;
         return function (params) {
             var dynamicTabSetting = dynamicPageData.WindowTabSetting.dynamicTabSetting;
             var dynTabSettingInputParams = dynamicTabSetting.inputParams;
