@@ -89,13 +89,13 @@ isc.JGWorkFlowGraph.addMethods({
 			datasource.markMultipleSelect();
 
 		}
-		this.on("SelectAction", this.SelectAction());
-		this.on("SelectAction", this.OnActivitySelected());
-		this.on("NoneSelected", this.NoneSelected());
-		this.on("insertEdge", this.insertEdge());
-		this.on("SelectedWF", this.SelectedWF());
-		this.on("ActivityDrop", this.ActivityDrop());
-		this.on("CopyActivity", this.CopyActivity());
+		this.on("SelectAction", this.SelectAction);
+		this.on("SelectAction", this.OnActivitySelected);
+		this.on("NoneSelected", this.NoneSelected);
+		this.on("insertEdge", this.insertEdge);
+		this.on("SelectedWF", this.SelectedWF);
+		this.on("ActivityDrop", this.ActivityDrop);
+		this.on("CopyActivity", this.CopyActivity);
 
 		isc.DataBindingUtil.bindEvent(this, "deleteCell", function (idArray) {
 			// 兼容参数为非数组的形式
@@ -730,8 +730,7 @@ isc.JGWorkFlowGraph.addMethods({
 			// if(activityPanel._lastSelectedTileRecord.commonName === '结束'){
 			// 	this.getOverCellInfo();
 			// }
-			//this._callEvent(this, 'ActivityDrop', activityPanel.widgetId, event.x + 10, event.y + 10);
-			this.ActivityDrop(activityPanel.widgetId, event.x + 10, event.y + 10);
+			this._callEvent(this, 'ActivityDrop', activityPanel.widgetId, event.x + 10, event.y + 10);	
 		}
 	},
 
@@ -802,7 +801,7 @@ isc.JGWorkFlowGraph.addMethods({
 						isc.JGWorkFlowGraph.currentInstanceId = _this.getID();
 						_this._currentInstanceId = _this.getID();
 						//console && console.log('_graph SelectedWF');
-						_this.SelectedWF(_this);
+						_this._callEvent(_this, 'SelectedWF', _this);
 						//console && console.log('mxGraph Select');
 						//_this._callEvent(_this, 'NoneSelected', null, _this, _this);
 					}
@@ -825,7 +824,7 @@ isc.JGWorkFlowGraph.addMethods({
 				var consumed = evt.consumed;
 				if ((!cell || cell == null) && !consumed) {
 					//console && console.log('mxGraph Click');
-					_this.NoneSelected(null, _this, _this);
+					_this._callEvent(_this, 'NoneSelected', null, _this, _this);
 				}
 				//_this._callEvent(_this, 'NoneSelected', null, _this, _this);
 			}
@@ -851,7 +850,7 @@ isc.JGWorkFlowGraph.addMethods({
 							cellIDArray.push({ 'id': cells[i].getId(), 'isEdge': cells[i].isEdge() });
 						}
 						//console && console.log('SelectionModel CHANGE');
-						_this.SelectAction(_this, cellIDArray);
+						_this._callEvent(_this, 'SelectAction', _this, cellIDArray);
 					} // else {
 					// console && console.log('_graph NoneSelected');
 					//    _this._callEvent(_this, 'NoneSelected', null, _this, _this);
@@ -870,8 +869,8 @@ isc.JGWorkFlowGraph.addMethods({
 					var cell = evt.properties.cells[0];
 					if (cell.isEdge()) {
 						var sourceID = evt.properties.source.getId();
-						var targetID = evt.properties.target.getId()
-						_this.insertEdge(_this, cell.getId(), sourceID, targetID);
+						var targetID = evt.properties.target.getId();
+						_this._callEvent(_this, 'insertEdge', _this, cell.getId(), sourceID, targetID);
 					}
 				}
 			}
@@ -977,9 +976,9 @@ isc.JGWorkFlowGraph.addMethods({
 					//提取选中的cell的id
 					var cellIDArray = [];
 					cellIDArray.push({ 'id': cells[i].getId(), 'sourceId': sourceCells[i].getId(), 'isEdge': cells[i].isEdge() });
-					this.CopyActivity(this, cellIDArray);
-					// 复制后自动选中环节
-					this.SelectAction(this, cellIDArray);
+					this._callEvent(this, 'CopyActivity', this, cellIDArray);
+		            // 复制后自动选中环节
+		            this._callEvent(this, 'SelectAction', this, cellIDArray);
 				}
 			}
 		}
@@ -1142,7 +1141,7 @@ isc.JGWorkFlowGraph.addMethods({
 
 		}
 		//加载完后，触发一下点空白的动作
-		this.NoneSelected(null, this, this);
+		this._callEvent(this, 'NoneSelected', null, this, this);
 	},
 	/**
    * 获取流程图XML
@@ -1317,12 +1316,10 @@ isc.JGWorkFlowGraph.addMethods({
 	 */
 	selectActivity: function (id) {
 		if (this._graph.getModel().getCell(id)) {
-			this._graph.setSelectionCell(this._graph.getModel().getCell(id));
-
-			var cellIDArray = [];
-			cellIDArray.push({ 'id': id, 'isEdge': false });	
-			this.SelectAction(_this, cellIDArray);
-			
+			this._graph.setSelectionCell(this._graph.getModel().getCell(id));	
+			this._callEvent(this, 'SelectAction', this, [
+				{ id: id, isEdge: false }
+			]);
 		}
 	},
 
