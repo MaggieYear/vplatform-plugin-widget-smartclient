@@ -271,6 +271,12 @@
                     "name": "执行表达式",
                     "type": "char",
                     "handler": "expression"
+                },
+                {
+                    "code": "getTableNameFormVM",
+                    "name": "从映射信息获取数据源编码",
+                    "type": "char",
+                    "handler": "getTableNameFormVM"
                 }
             ],
             "dependencies": [

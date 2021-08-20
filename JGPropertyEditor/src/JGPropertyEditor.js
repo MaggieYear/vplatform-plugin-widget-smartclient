@@ -75,8 +75,8 @@ isc.JGPropertyEditor.addMethods({
 			if ((item.hasDoUpdateDataValue && item.hasDoUpdateDataValue == newValue) || newValue == "已设置") {
 				return;
 			}
-			var dsName = isc.WidgetDatasource.getBindDatasourceName(this);
-			var datasource = _this._lookup(dsName);
+			var dsName = _this.getTableNameFormVM(_this.code);
+			var datasource = _this._lookup(ds.dsName);
 			var selRecords = datasource.getSelectedRecords().toArray();
 			if (item && item.name && selRecords && selRecords.length > 0) {
 				for (var i = 0; i < selRecords.length; i++) {
@@ -103,8 +103,7 @@ isc.JGPropertyEditor.addMethods({
 	setRowValue: function (dbSelectedRows, widgetId) {
 		// 获取关联的流程画布控件ID
 		var propertyDatas = {};
-		var ds = isc.WidgetDatasource.getBindDatasource(this);
-		var dataSourceName = ds.dsName;
+		var dataSourceName = this.getTableNameFormVM(this.code);
 		for (var i = 0; i < dbSelectedRows.length; i++) {
 			var propertyValueObj = dbSelectedRows[i];
 			var field = propertyValueObj[dataSourceName + ".propertyName"];
