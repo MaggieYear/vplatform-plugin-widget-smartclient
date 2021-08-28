@@ -286,6 +286,13 @@
                     "pluginSymbolicName": "vjs.framework.extension.platform.plugin.ui.smartclient.JGBaseWidget",
                     "pluginCode": "JGBaseWidget",
                     "pluginType": "widget"
+                },
+                {
+                    "groupId": "com.toone.v3.platform",
+                    "code": "smartclient.PropertyEditorJGBaseDictBoxOpenSwitcher",
+                    "pluginSymbolicName": "smartclient.PropertyEditorJGBaseDictBoxOpenSwitcher",
+                    "pluginCode": "smartclient.PropertyEditorJGBaseDictBoxOpenSwitcher",
+                    "pluginType": "widget"
                 }
             ]
         }

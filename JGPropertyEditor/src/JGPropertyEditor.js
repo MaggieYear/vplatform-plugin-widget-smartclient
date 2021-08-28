@@ -75,8 +75,8 @@ isc.JGPropertyEditor.addMethods({
 			if ((item.hasDoUpdateDataValue && item.hasDoUpdateDataValue == newValue) || newValue == "已设置") {
 				return;
 			}
-			var dsName = _this.getTableNameFormVM(_this.code);
-			var datasource = _this._lookup(ds.dsName);
+			var dsName = _this.bindDatasourceName;
+			var datasource = _this._lookup(dsName);
 			var selRecords = datasource.getSelectedRecords().toArray();
 			if (item && item.name && selRecords && selRecords.length > 0) {
 				for (var i = 0; i < selRecords.length; i++) {
@@ -103,11 +103,10 @@ isc.JGPropertyEditor.addMethods({
 	setRowValue: function (dbSelectedRows, widgetId) {
 		// 获取关联的流程画布控件ID
 		var propertyDatas = {};
-		var dataSourceName = this.getTableNameFormVM(this.code);
 		for (var i = 0; i < dbSelectedRows.length; i++) {
 			var propertyValueObj = dbSelectedRows[i];
-			var field = propertyValueObj[dataSourceName + ".propertyName"];
-			var propertyValue = propertyValueObj[dataSourceName + ".propertyValue"];
+			var field = propertyValueObj["propertyName"];
+			var propertyValue = propertyValueObj["propertyValue"];
 			propertyDatas[field] = propertyValue;
 		}
 		this.loadData(propertyDatas);
@@ -231,8 +230,9 @@ isc.JGPropertyEditor.addMethods({
 
 	bindWidgetData: function (datasourceName) {
 		var _this = this;
-		this.putWidgetContextProperty(this.code,"bindDatasourceName",datasourceName);
-		var ds = isc.JGDataSourceManager.get(this,datasourceName);
+		this.bindDatasourceName = datasourceName;
+		this.putWidgetContextProperty(_this.code, "bindDatasourceName", datasourceName);
+		var ds = isc.JGDataSourceManager.get(_this, datasourceName);
 		isc.DatasourceUtil.addDatasourceSelectEventHandler(ds, function (valueObj) {
 			var values = valueObj.resultSet;
 			if (values && values.length > 0) {
