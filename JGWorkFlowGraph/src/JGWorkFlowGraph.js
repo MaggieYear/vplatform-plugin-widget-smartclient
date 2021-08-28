@@ -50,6 +50,40 @@ isc.JGWorkFlowGraph.addMethods({
 
 	_initEventAndDataBind: function () {
 		var _this = this;
+		var observer = isc.DatasourceObserver.create({
+			"updateHandler": function (datas) {
+				var oldDatas = datas.datasource.getAllRecords();
+				var _map = {};
+				var mappings = {};
+				for (var ix = 0; ix < oldDatas.length; ix++) {
+					var od = oldDatas[ix];
+					_map[od.id] = od;
+					if (od.propertyName == "name") {
+						var activityId = od.activityId;
+						if (!mappings[activityId]) {
+							mappings[activityId] = [od]
+						} else {
+							mappings[activityId].push(od);
+						}
+					}
+				}
+				var changeDatas = datas.resultSet;
+				for (var ix = 0; ix < changeDatas.length; ix++) {
+					var od = changeDatas[ix];
+					var record = _map[od.id];
+					var activityId = record.activityId;
+					var mapping = mappings[activityId];
+					if (mapping) {
+						for (var ix = 0; ix < mapping.length; ix++) {
+							var map = mapping[ix];
+							_this.changLabel(activityId, map.propertyValue)
+						}
+					}
+				}
+			}
+		})
+		var datasource = _this.getDataSource();
+		datasource.addObserver(observer);
 		isc.WidgetDatasource.addBindDatasourceUpdateEventHandler(function (params) {
 			var resultSet = params.resultSet,
 				datasource = params.datasource;
@@ -89,13 +123,13 @@ isc.JGWorkFlowGraph.addMethods({
 			datasource.markMultipleSelect();
 
 		}
-		this.on("SelectAction", this.SelectAction);
+		//this.on("SelectAction", this.SelectAction);
 		this.on("SelectAction", this.OnActivitySelected);
-		this.on("NoneSelected", this.NoneSelected);
-		this.on("insertEdge", this.insertEdge);
-		this.on("SelectedWF", this.SelectedWF);
-		this.on("ActivityDrop", this.ActivityDrop);
-		this.on("CopyActivity", this.CopyActivity);
+		//this.on("NoneSelected", this.NoneSelected);
+		//this.on("insertEdge", this.insertEdge);
+		//this.on("SelectedWF", this.SelectedWF);
+		//this.on("ActivityDrop", this.ActivityDrop);
+		//this.on("CopyActivity", this.CopyActivity);
 
 		isc.DataBindingUtil.bindEvent(this, "deleteCell", function (idArray) {
 			// 兼容参数为非数组的形式
@@ -730,7 +764,7 @@ isc.JGWorkFlowGraph.addMethods({
 			// if(activityPanel._lastSelectedTileRecord.commonName === '结束'){
 			// 	this.getOverCellInfo();
 			// }
-			this._callEvent(this, 'ActivityDrop', activityPanel.widgetId, event.x + 10, event.y + 10);	
+			this._callEvent(this, 'ActivityDrop', activityPanel.widgetId, event.x + 10, event.y + 10);
 		}
 	},
 
@@ -977,8 +1011,8 @@ isc.JGWorkFlowGraph.addMethods({
 					var cellIDArray = [];
 					cellIDArray.push({ 'id': cells[i].getId(), 'sourceId': sourceCells[i].getId(), 'isEdge': cells[i].isEdge() });
 					this._callEvent(this, 'CopyActivity', this, cellIDArray);
-		            // 复制后自动选中环节
-		            this._callEvent(this, 'SelectAction', this, cellIDArray);
+					// 复制后自动选中环节
+					this._callEvent(this, 'SelectAction', this, cellIDArray);
 				}
 			}
 		}
@@ -1164,40 +1198,40 @@ isc.JGWorkFlowGraph.addMethods({
 		return processFileXml;
 	},
 
-	
-    /**
-     * 将前台数据提交后台，并生成XML数据
-     * 
-     * @param processFileDatas
-     *            活动环节DB数据
-     */
-    _generateProcessXml: function(processFileDatas) {
-        var componentCode = this.componentCode;
-        var windowCode = this.widgetCode;
-        var params = {
-            "processFileDatas": processFileDatas,
-            "moduleId": windowCode
-        }
-        var ret = {};
-        var requestParams = {
-            "componentCode": componentCode,
-            "windowCode": windowCode,
-            "operation": "GenerateWorkFlowProcessXML",
-            "isAsync": false,
-            "params": params,
-            "success": function(result) {
-                ret = result == null ? {} : result.data.xml;
-            },
-            "error": function(result) {
-				if(window.console&&window.console.warn){
+
+	/**
+	 * 将前台数据提交后台，并生成XML数据
+	 * 
+	 * @param processFileDatas
+	 *            活动环节DB数据
+	 */
+	_generateProcessXml: function (processFileDatas) {
+		var componentCode = this.componentCode;
+		var windowCode = this.widgetCode;
+		var params = {
+			"processFileDatas": processFileDatas,
+			"moduleId": windowCode
+		}
+		var ret = {};
+		var requestParams = {
+			"componentCode": componentCode,
+			"windowCode": windowCode,
+			"operation": "GenerateWorkFlowProcessXML",
+			"isAsync": false,
+			"params": params,
+			"success": function (result) {
+				ret = result == null ? {} : result.data.xml;
+			},
+			"error": function (result) {
+				if (window.console && window.console.warn) {
 					window.console.error("生成流程定义文件XML失败\n->" + result.message);
 				}
-                throw new Error("生成流程定义文件XML失败\n->" + result.message);
-            }
-        };
+				throw new Error("生成流程定义文件XML失败\n->" + result.message);
+			}
+		};
 		this._remoteOperation(requestParams);
-        return ret;
-    },
+		return ret;
+	},
 
 	getDefinitionJson: function (widgetId) {
 		var datasource = this.getDataSource();
@@ -1316,7 +1350,7 @@ isc.JGWorkFlowGraph.addMethods({
 	 */
 	selectActivity: function (id) {
 		if (this._graph.getModel().getCell(id)) {
-			this._graph.setSelectionCell(this._graph.getModel().getCell(id));	
+			this._graph.setSelectionCell(this._graph.getModel().getCell(id));
 			this._callEvent(this, 'SelectAction', this, [
 				{ id: id, isEdge: false }
 			]);
@@ -1445,6 +1479,14 @@ isc.JGWorkFlowGraph.addMethods({
 		this.setCellStyle(activityId, imgSrc);
 	},
 
+	/**
+	 * 通过id查找活动，并改变label的名字
+	 */
+	changLabel: function (id, value) {
+		if (this._graph.getModel().getCell(id))
+			this._graph.getModel().setValue(
+				this._graph.getModel().getCell(id), value);
+	},
 	/**
 	 * 获取默认值
 	 */
@@ -1671,7 +1713,7 @@ isc.JGWorkFlowGraph.addMethods({
 		var dsName = this.getTableNameFormVM(this.code);
 		return isc.JGDataSourceManager.get(this, dsName);
 	},
-	setCellStyle: function(id, imgSrc) {
+	setCellStyle: function (id, imgSrc) {
 		var cell = this._graph.getModel().getCell(id);
 		if (cell) {
 			this._graph.setCellStyles('image', imgSrc, [cell]);

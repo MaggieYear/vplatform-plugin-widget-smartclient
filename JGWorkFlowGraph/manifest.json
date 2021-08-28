@@ -307,7 +307,8 @@
                     "name": "执行后台操作",
                     "type": "char",
                     "handler": "remoteOperation"
-                  }
+                }
+
             ],
             "dependencies": [
                 {
