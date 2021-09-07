@@ -236,7 +236,13 @@ isc.JGLinkLabel.addMethods({
 
 	getWebParam: function () {
 		var param = this.WebParam;
-        var paramValue = isc.JSON.decode(param);
+		var paramValue = null;
+		try {
+			paramValue = isc.JSON.decode(param);
+		} catch (e){
+			paramValue = '';
+		}
+
         var retValue = '';
         if (paramValue && paramValue.NewDataSet &&
             paramValue.NewDataSet.dtParameter) {
