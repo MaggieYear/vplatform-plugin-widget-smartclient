@@ -1551,8 +1551,8 @@ isc.JGWorkFlowGraph.addMethods({
 	 * 获取流程所有属性信息
 	 */
 	getProcessPropertyInfo: function () {
-		var _ProcessSetting = this._ProcessSetting;
 		this._genProcessSetting();
+		var _ProcessSetting = this._ProcessSetting;
 		if (!_ProcessSetting)
 			return;
 		var type = "Process";
